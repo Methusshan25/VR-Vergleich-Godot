@@ -1,0 +1,111 @@
+[gd_scene load_steps=20 format=3 uid="uid://4ujuqo0mv8m7"]
+
+[ext_resource type="Script" path="res://Main.gd" id="1_geurq"]
+[ext_resource type="PackedScene" uid="uid://bq86r4yll8po" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_fullglove_low.tscn" id="2_jmmp8"]
+[ext_resource type="PackedScene" uid="uid://xqimcf20s2jp" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_fullglove_low.tscn" id="3_fpfew"]
+[ext_resource type="PackedScene" uid="uid://b4ysuy43poobf" path="res://addons/godot-xr-tools/functions/function_pickup.tscn" id="4_shrmm"]
+[ext_resource type="Material" uid="uid://ki7cscba1cjo" path="res://Materials/Table.tres" id="4_v5m4w"]
+[ext_resource type="Script" path="res://Scripts/ray_casting.gd" id="5_3qekj"]
+[ext_resource type="Script" path="res://Scripts/immediate_mesh.gd" id="6_nu0kh"]
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_a2w6t"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_x5ksh"]
+
+[sub_resource type="Sky" id="Sky_w0v8x"]
+sky_material = SubResource("ProceduralSkyMaterial_x5ksh")
+
+[sub_resource type="Environment" id="Environment_r6y2s"]
+background_mode = 2
+sky = SubResource("Sky_w0v8x")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2ed0m"]
+size = Vector3(10, 0.1, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_xlll6"]
+size = Vector2(10, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vkliw"]
+size = Vector3(1, 1.5, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4m4al"]
+size = Vector3(1, 1.5, 1)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_566ps"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_k6mmm"]
+radius = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t8d74"]
+albedo_color = Color(0.0470588, 0.611765, 0.211765, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_tsbun"]
+material = SubResource("StandardMaterial3D_t8d74")
+radius = 0.2
+height = 0.4
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_geurq")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+
+[node name="XRControllerLeft" type="XRController3D" parent="XROrigin3D"]
+tracker = &"left_hand"
+
+[node name="LeftHand" parent="XROrigin3D/XRControllerLeft" instance=ExtResource("2_jmmp8")]
+
+[node name="XRControllerRight" type="XRController3D" parent="XROrigin3D"]
+tracker = &"right_hand"
+
+[node name="RightHand" parent="XROrigin3D/XRControllerRight" instance=ExtResource("3_fpfew")]
+
+[node name="FunctionPickup" parent="XROrigin3D/XRControllerRight" instance=ExtResource("4_shrmm")]
+ranged_enable = false
+
+[node name="RayCast3D" type="RayCast3D" parent="XROrigin3D/XRControllerRight"]
+transform = Transform3D(0.895712, 0.444635, -1.94356e-08, 0, -4.37114e-08, -1, -0.444635, 0.895712, -3.91528e-08, -0.00667508, -0.00944878, 0)
+collision_mask = 9
+collide_with_areas = true
+debug_shape_custom_color = Color(0, 0.243137, 0.690196, 1)
+script = ExtResource("5_3qekj")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRControllerRight/RayCast3D"]
+mesh = SubResource("ImmediateMesh_a2w6t")
+script = ExtResource("6_nu0kh")
+raycast_node_path = NodePath("..")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_r6y2s")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_2ed0m")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor/CollisionShape3D"]
+mesh = SubResource("PlaneMesh_xlll6")
+
+[node name="Table" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.236024, -0.827265)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Table"]
+shape = SubResource("BoxShape3D_vkliw")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Table/CollisionShape3D"]
+material_override = ExtResource("4_v5m4w")
+mesh = SubResource("BoxMesh_4m4al")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.160318, 0.722817, -0.804792)
+collision_layer = 9
+collision_mask = 9
+physics_material_override = SubResource("PhysicsMaterial_566ps")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("SphereShape3D_k6mmm")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
+mesh = SubResource("SphereMesh_tsbun")
