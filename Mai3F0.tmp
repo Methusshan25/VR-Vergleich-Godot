@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://4ujuqo0mv8m7"]
+[gd_scene load_steps=22 format=3 uid="uid://4ujuqo0mv8m7"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_geurq"]
 [ext_resource type="PackedScene" uid="uid://bq86r4yll8po" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_fullglove_low.tscn" id="2_jmmp8"]
@@ -9,10 +9,7 @@
 [ext_resource type="Script" path="res://Scripts/ray_casting.gd" id="5_3qekj"]
 [ext_resource type="Script" path="res://Scripts/immediate_mesh.gd" id="6_nu0kh"]
 [ext_resource type="PackedScene" uid="uid://diyu06cw06syv" path="res://addons/godot-xr-tools/player/player_body.tscn" id="9_cxn57"]
-[ext_resource type="PackedScene" uid="uid://bl2nuu3qhlb5k" path="res://addons/godot-xr-tools/functions/movement_direct.tscn" id="9_skv6q"]
-[ext_resource type="PackedScene" uid="uid://cqhw276realc" path="res://addons/godot-xr-tools/functions/function_pointer.tscn" id="9_tbivt"]
-[ext_resource type="PackedScene" uid="uid://clujaf3u776a3" path="res://addons/godot-xr-tools/objects/viewport_2d_in_3d.tscn" id="12_61adh"]
-[ext_resource type="PackedScene" uid="uid://dd4dronu4kwy2" path="res://Scenes/uiScene.tscn" id="13_55jhh"]
+[ext_resource type="PackedScene" uid="uid://c8l60rnugru40" path="res://addons/godot-xr-tools/objects/pickable.tscn" id="11_mf3om"]
 
 [sub_resource type="ImmediateMesh" id="ImmediateMesh_a2w6t"]
 
@@ -37,15 +34,15 @@ size = Vector3(1, 1.5, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_4m4al"]
 size = Vector3(1, 1.5, 1)
 
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ivce5"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_b1p6e"]
+size = Vector3(0.2, 0.2, 0.2)
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_i7ae5"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dng4s"]
+albedo_color = Color(0.602284, 0.935899, 0.920985, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7t1ye"]
-albedo_color = Color(0.270588, 0.4, 1, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_6ua00"]
-material = SubResource("StandardMaterial3D_7t1ye")
+[sub_resource type="BoxMesh" id="BoxMesh_87h7h"]
+material = SubResource("StandardMaterial3D_dng4s")
+size = Vector3(0.2, 0.2, 0.2)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_geurq")
@@ -59,13 +56,10 @@ tracker = &"left_hand"
 
 [node name="LeftHand" parent="XROrigin3D/XRControllerLeft" instance=ExtResource("2_jmmp8")]
 
-[node name="MovementTurn" parent="XROrigin3D/XRControllerLeft" instance=ExtResource("4_a1w7y")]
-turn_mode = 2
-smooth_turn_speed = 5.0
-
 [node name="FunctionTeleport" parent="XROrigin3D/XRControllerLeft" instance=ExtResource("3_wl3eo")]
-collision_mask = 784
-valid_teleport_mask = 4294967056
+player_radius = 0.25
+
+[node name="MovementTurn" parent="XROrigin3D/XRControllerLeft" instance=ExtResource("4_a1w7y")]
 
 [node name="XRControllerRight" type="XRController3D" parent="XROrigin3D"]
 tracker = &"right_hand"
@@ -84,14 +78,6 @@ script = ExtResource("5_3qekj")
 mesh = SubResource("ImmediateMesh_a2w6t")
 script = ExtResource("6_nu0kh")
 raycast_node_path = NodePath("..")
-
-[node name="FunctionPointer" parent="XROrigin3D/XRControllerRight" instance=ExtResource("9_tbivt")]
-transform = Transform3D(0.904142, 0, 0.427232, 0, 1, 0, -0.427232, 0, 0.904142, 0, 0, 0)
-show_laser = 2
-laser_length = 1
-collision_mask = 5243008
-
-[node name="MovementDirect" parent="XROrigin3D/XRControllerRight" instance=ExtResource("9_skv6q")]
 
 [node name="PlayerBody" parent="XROrigin3D" instance=ExtResource("9_cxn57")]
 
@@ -124,25 +110,13 @@ layers = 16
 material_override = ExtResource("4_v5m4w")
 mesh = SubResource("BoxMesh_4m4al")
 
-[node name="Ball" type="RigidBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.630768, -1.04731)
-collision_layer = 9
-collision_mask = 9
-mass = 0.01
-physics_material_override = SubResource("PhysicsMaterial_ivce5")
+[node name="PickableObject" parent="." instance=ExtResource("11_mf3om")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.680632, -0.827265)
+press_to_hold = false
+picked_up_layer = 65545
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball"]
-transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
-shape = SubResource("SphereShape3D_i7ae5")
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="PickableObject"]
+shape = SubResource("BoxShape3D_b1p6e")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ball/CollisionShape3D"]
-mesh = SubResource("SphereMesh_6ua00")
-
-[node name="UI" parent="." instance=ExtResource("12_61adh")]
-transform = Transform3D(0.003, 0, 0, 0, 0.003, 0, 0, 0, 0.003, 0, 1.25631, -1.97139)
-screen_size = Vector2(640, 360)
-collision_layer = 5243008
-scene = ExtResource("13_55jhh")
-viewport_size = Vector2(640, 360)
-unshaded = true
-scene_properties_keys = PackedStringArray()
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PickableObject/CollisionShape3D2"]
+mesh = SubResource("BoxMesh_87h7h")
