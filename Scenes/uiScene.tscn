@@ -1,10 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://dd4dronu4kwy2"]
+[gd_scene load_steps=5 format=3 uid="uid://dd4dronu4kwy2"]
 
-[ext_resource type="Script" path="res://Scenes/option_button.gd" id="1_kimng"]
+[ext_resource type="Script" path="res://Scenes/main_menu.gd" id="1_pxi1r"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_y4tws"]
 font_size = 40
-font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_sxvor"]
+font_size = 26
+
+[sub_resource type="Theme" id="Theme_piehw"]
 
 [node name="CanvasLayer" type="CanvasLayer"]
 follow_viewport_enabled = true
@@ -16,30 +20,55 @@ offset_right = 605.0
 offset_bottom = 351.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+script = ExtResource("1_pxi1r")
 
 [node name="ColorRect" type="ColorRect" parent="Control"]
 layout_mode = 0
 offset_right = 679.0
 offset_bottom = 391.0
+color = Color(0.435294, 0.0980392, 0.4, 0.352941)
 
 [node name="MarginContainer" type="MarginContainer" parent="Control/ColorRect"]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = -1.0
+offset_top = 1.0
+offset_right = 677.0
+offset_bottom = 181.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/ColorRect/MarginContainer"]
+layout_direction = 1
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+size_flags_stretch_ratio = 0.0
 
-[node name="Label" type="Label" parent="Control/ColorRect/MarginContainer/VBoxContainer"]
+[node name="Label2" type="Label" parent="Control/ColorRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Settings"
 label_settings = SubResource("LabelSettings_y4tws")
 horizontal_alignment = 1
 
-[node name="OptionButton" type="OptionButton" parent="Control/ColorRect/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="Control/ColorRect/MarginContainer/VBoxContainer"]
 layout_mode = 2
+text = "Teleport"
+label_settings = SubResource("LabelSettings_sxvor")
+horizontal_alignment = 1
+
+[node name="OptionButton" type="OptionButton" parent="Control/ColorRect/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+size_flags_stretch_ratio = 0.0
+theme = SubResource("Theme_piehw")
 item_count = 2
-popup/item_0/text = "Teleport"
-popup/item_1/text = "Continious Movement"
+popup/item_0/text = "Activated"
+popup/item_1/text = "Deactivaed"
 popup/item_1/id = 1
-script = ExtResource("1_kimng")
+
+[node name="Button" type="Button" parent="Control/ColorRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Reset Sphere"
+
+[connection signal="item_selected" from="Control/ColorRect/MarginContainer/VBoxContainer/OptionButton" to="Control" method="_on_option_button_item_selected"]
+[connection signal="pressed" from="Control/ColorRect/MarginContainer/VBoxContainer/Button" to="Control" method="_on_button_pressed"]
